@@ -1,5 +1,12 @@
 trigger:
-- main
+  branches:
+    include:
+      - '*'
+
+pr:
+  branches:
+    include:
+      - main
 
 pool:
   vmImage: 'windows-2019'
@@ -58,6 +65,7 @@ stages:
 
 - stage: Deploy
   dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
   - job: DeployJob
     steps:
