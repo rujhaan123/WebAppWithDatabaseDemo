@@ -1,8 +1,74 @@
-﻿@{
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - My Web App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            text-align: center;
+        }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #666;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to My Web App</h1>
+        <p>Explore the world of ASP.NET Core and build modern web applications.</p>
+        <div style="text-align: center;">
+            <a class="btn" href="https://docs.microsoft.com/aspnet/core" target="_blank">Get Started with ASP.NET Core</a>
+        </div>
+        <hr>
+        <h2>Features</h2>
+        <ul>
+            <li>Responsive design</li>
+            <li>Integration with Azure services</li>
+            <li>Secure authentication and authorization</li>
+            <li>RESTful API development</li>
+        </ul>
+        <hr>
+        <h2>About Us</h2>
+        <p>We are passionate about technology and dedicated to delivering high-quality web solutions to our clients.</p>
+        <h3>Contact Us</h3>
+        <p>Email: contact@example.com</p>
+        <p>Phone: +1-123-456-7890</p>
+    </div>
+</body>
+</html>
