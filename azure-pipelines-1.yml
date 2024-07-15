@@ -1,0 +1,73 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-2019'
+
+variables:
+  BuildConfiguration: 'Release'
+  ConnectedServiceName: 'bd81ff36-5055-4fe5-905d-c299ef19f4cb'
+  WebAppKind: 'webApp'
+  WebAppName: 'rbtestnet'
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET 6 SDK'
+      inputs:
+        packageType: 'sdk'
+        version: '6.0.x'
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        command: 'restore'
+        projects: '**/WebApp.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Web App'
+      inputs:
+        command: 'build'
+        projects: '**/WebApp.csproj'
+        arguments: '--configuration $(BuildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Run Unit Tests'
+      inputs:
+        command: 'test'
+        projects: '**/*UnitTest*.csproj'
+        arguments: '--configuration $(BuildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Create Web App Package (.zip)'
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: true
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact (WebApp.zip)'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    steps:
+    - download: current
+      artifact: drop
+
+    - task: AzureRmWebAppDeployment@4
+      displayName: 'Deploy Azure App Service'
+      inputs:
+        azureSubscription: '$(ConnectedServiceName)'
+        appType: '$(WebAppKind)'
+        WebAppName: '$(WebAppName)'
+        packageForLinux: '$(Pipeline.Workspace)/drop/WebApp.zip'
