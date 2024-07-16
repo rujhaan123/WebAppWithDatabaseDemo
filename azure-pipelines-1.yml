@@ -35,12 +35,43 @@ stages:
         command: 'restore'
         projects: '**/WebApp.csproj'
 
+    - checkout: self
+      fetchDepth: 0
+    
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          $paths = Get-ChildItem -include *.csproj -Recurse
+          foreach($pathobject in $paths) 
+          {
+              $path = $pathobject.fullname
+              $doc = New-Object System.Xml.XmlDocument
+              $doc.Load($path)
+              $child = $doc.CreateElement("ProjectGuid")
+              $child.InnerText = [guid]::NewGuid().ToString().ToUpper()
+              $node = $doc.SelectSingleNode("//Project/PropertyGroup")
+              $node.AppendChild($child)
+              $doc.Save($path)
+          }
+        workingDirectory: 'Webapp'
+
+    - task: SonarCloudPrepare@2
+      inputs:
+        SonarCloud: 'Sonar'
+        organization: 'sonarrbtestado'
+        scannerMode: 'MSBuild'
+        projectKey: 'rbd26400_IntegrationPipelines'
+        projectName: 'IntegrationPipelines'
+    
+
     - task: DotNetCoreCLI@2
       displayName: 'Build Web App'
       inputs:
         command: 'build'
         projects: '**/WebApp.csproj'
         arguments: '--configuration $(BuildConfiguration)'
+  
 
     - task: DotNetCoreCLI@2
       displayName: 'Run Unit Tests'
@@ -56,12 +87,21 @@ stages:
         publishWebProjects: true
         arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
+      
+    
+    - task: SonarCloudAnalyze@2
+      displayName: 'Run Code Analysis'
+      
+    - task: SonarCloudPublish@2
+      displayName: 'Publish Quality Gate Result'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact (WebApp.zip)'
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
+  
+
 
 - stage: Deploy
   dependsOn: Build
