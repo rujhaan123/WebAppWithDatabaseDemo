@@ -6,7 +6,7 @@ trigger:
 pr:
   branches:
     include:
-      - main
+      - master
 
 pool:
   vmImage: 'windows-2019'
@@ -22,6 +22,9 @@ stages:
   jobs:
   - job: BuildJob
     steps:
+    - checkout: self
+      fetchDepth: 0
+
     - task: UseDotNet@2
       displayName: 'Install .NET 6 SDK'
       inputs:
@@ -33,15 +36,12 @@ stages:
       displayName: 'Restore NuGet Packages'
       inputs:
         command: 'restore'
-        projects: '**/WebApp.csproj'
+        projects: '**/WebApp.csproj'  # Adjust if necessary
       
     - task: WhiteSource@21
       inputs:
         cwd: '$(System.DefaultWorkingDirectory)'
 
-    - checkout: self
-      fetchDepth: 0
-    
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
@@ -68,7 +68,6 @@ stages:
         projectKey: 'rbd26400_IntegrationPipelines'
         projectName: 'IntegrationPipelines'
     
-
     - task: DotNetCoreCLI@2
       displayName: 'Build Web App'
       inputs:
@@ -76,7 +75,6 @@ stages:
         projects: '**/WebApp.csproj'
         arguments: '--configuration $(BuildConfiguration)'
   
-
     - task: DotNetCoreCLI@2
       displayName: 'Run Unit Tests'
       inputs:
@@ -91,7 +89,6 @@ stages:
         publishWebProjects: true
         arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
-      
     
     - task: SonarCloudAnalyze@2
       displayName: 'Run Code Analysis'
@@ -104,12 +101,10 @@ stages:
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
-  
-
 
 - stage: Deploy
   dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - job: DeployJob
     steps:
