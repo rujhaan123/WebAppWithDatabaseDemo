@@ -41,6 +41,8 @@ stages:
     - task: WhiteSource@21
       inputs:
         cwd: '$(System.DefaultWorkingDirectory)'
+        projectName: 'IntegrationPipelines'
+      continueOnError: true
 
     - task: PowerShell@2
       inputs:
