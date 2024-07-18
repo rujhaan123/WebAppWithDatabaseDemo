@@ -276,9 +276,11 @@ stages:
   jobs:
   - job: DeployWebAppJob
     steps:
-      - task: AzureRmWebAppDeployment@4
-        displayName: 'Deploy Azure App Service'
+    - task: AzureRmWebAppDeployment@4
+      displayName: 'Deploy Azure App Service'
+      inputs:
+        ConnectionType: 'AzureRM'
         azureSubscription: '$(ConnectedServiceName)'
-        appType: '$(WebAppKind)'
+        appType: 'webApp'
         WebAppName: '$(WebAppName)'
         packageForLinux: '$(Pipeline.Workspace)/drop/WebApp.zip'
