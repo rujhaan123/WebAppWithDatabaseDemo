@@ -211,7 +211,7 @@ stages:
       displayName: Preview Template Changes (What-If)
       inputs:
         workingDirectory: $(System.DefaultWorkingDirectory)/arm/
-        azureSubscription: 'WebAppWithDatabaseDemo_spn'
+        azureSubscription: '$(ConnectedServiceName)'
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: 'az deployment group what-if --resource-group $(ResourceGroupName) --name rollout01 --template-file  WebSiteSQLDatabase.json --parameters WebSiteSQLDatabase.parameters.json'
@@ -221,8 +221,8 @@ stages:
       displayName: Deploy ARM templates
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: 'WebAppWithDatabaseDemo_spn'
-        subscriptionId: '4b72ed90-7ca3-4e76-8d0f-31a2c0bee7a3'
+        azureResourceManagerConnection: 'rbd26400-IntegrationPipelines-41ee97a2-4cba-49cf-8f61-ec4fb9d572aa'
+        subscriptionId: '$(ConnectedServiceName)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: '$(ResourceGroupName)'
         location: 'West Europe'
