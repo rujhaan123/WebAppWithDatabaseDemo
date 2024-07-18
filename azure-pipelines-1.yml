@@ -272,6 +272,7 @@ stages:
         EnableGSSscan: true
 
 - stage: Deployment
+  dependsOn: Build
   jobs:
   - job: DeployWebAppJob
     steps:
