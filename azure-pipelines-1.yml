@@ -103,6 +103,62 @@ stages:
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
+        
+  - job: Database
+    displayName: Build Database
+    pool:
+      vmImage: 'windows-2019'
+      demands: msbuild
+    steps:
+
+    - task: MSBuild@1
+      displayName: Build WebApp.Database.sqlproj
+      inputs:
+        solution: WebApp.Database/WebApp.Database.sqlproj
+        msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Artifact (Dacpac)
+      inputs:
+        ArtifactName: dacpac
+
+  - job: Selenium
+    displayName: Build UI Tests
+    pool:
+      vmImage: 'windows-2019'
+      demands: msbuild
+
+    steps:
+    - task: NuGetToolInstaller@0
+      displayName: Use NuGet 4.3.0
+
+    - task: NuGetCommand@2
+      displayName: Restore NuGet Packages
+      inputs:
+        restoreSolution: WebAppWithDatabase.sln
+
+    - task: MSBuild@1
+      displayName: Build SeleniumUiTests.csproj
+      inputs:
+        solution: SeleniumUiTests/SeleniumUiTests.csproj
+        msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: UI-Test'
+      inputs:
+        ArtifactName: ui-tests
+
+  - job: Infrastructure
+    displayName: Publish Infra files
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: ARM templates'
+      inputs:
+        PathtoPublish: AzureResourceGroupDeployment
+        ArtifactName: arm
 
 - stage: Deploy
   dependsOn: Build
