@@ -197,7 +197,7 @@ stages:
       displayName: Validate ARM templates
       enabled: ${{ parameters.runCompletePipeline }}
       inputs:
-        azureSubscription: 'rbd26400-IntegrationPipelines-41ee97a2-4cba-49cf-8f61-ec4fb9d572aa'
+        azureSubscription: 'Free Trial (41ee97a2-4cba-49cf-8f61-ec4fb9d572aa)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: '$(ResourceGroupName)'
         location: 'West Europe'
@@ -221,7 +221,7 @@ stages:
       displayName: Deploy ARM templates
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: 'rbd26400-IntegrationPipelines-41ee97a2-4cba-49cf-8f61-ec4fb9d572aa'
+        azureResourceManagerConnection: 'Free Trial (41ee97a2-4cba-49cf-8f61-ec4fb9d572aa)'
         subscriptionId: '$(ConnectedServiceName)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: '$(ResourceGroupName)'
