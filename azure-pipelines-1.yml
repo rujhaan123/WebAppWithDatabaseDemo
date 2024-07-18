@@ -10,6 +10,12 @@ pr:
 
 pool:
   vmImage: 'windows-2019'
+  
+parameters:
+- name: runCompletePipeline
+  displayName: Run All Tasks ?
+  type: boolean
+  default: true
 
 variables:
   BuildConfiguration: 'Release'
